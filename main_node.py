@@ -17,7 +17,7 @@ rate = rospy.Rate(10)
 toleratedDistance = 0.2
 command = Twist()
 humanSector = Sector()
-path = []
+sectorsectorPath = []
 currentPosition = Pose()
 
 sec_pub = rospy.Publisher("/human/sector", Sector, queue_size=10)
@@ -34,7 +34,7 @@ def getLocation(current: Pose):
     global currentPosition
     currentPosition = current
 
-def pathFindRest(startingx, startingy, trueForRight):
+def sectorPathFindRest(startingx, startingy, trueForRight):
     goRight = trueForRight
     currentx = startingx
     currenty = startingy
@@ -44,7 +44,7 @@ def pathFindRest(startingx, startingy, trueForRight):
                 sector = Sector()
                 sector.x = i
                 sector.y = currenty
-                path.append(sector)
+                sectorsectorPath.append(sector)
                 currentx = i
             currenty += 1
             goRight = not goRight
@@ -53,12 +53,12 @@ def pathFindRest(startingx, startingy, trueForRight):
                 sector = Sector()
                 sector.x = i
                 sector.y = currenty
-                path.append(sector)
+                sectorsectorPath.append(sector)
                 currentx = i
             currenty += 1
             goRight = not goRight
 
-def pathFindUpTo(endx, endy):
+def sectorPathFindUpTo(endx, endy):
     goRight = True
     currentx = 0
     currenty = 0
@@ -68,7 +68,7 @@ def pathFindUpTo(endx, endy):
                 sector = Sector()
                 sector.x = i
                 sectory = currenty
-                path.append(sector)
+                sectorPath.append(sector)
                 currentx = i
             sectory += 1
             goRight = not goRight
@@ -77,26 +77,37 @@ def pathFindUpTo(endx, endy):
                 sector = Sector()
                 sector.x = i
                 sector.y = currenty
-                path.append(sector)
+                sectorPath.append(sector)
                 currentx = i
             currenty += 1
             goRight = not goRight
 
-def pathFindForHuman():
+def sectorPathFindForHuman():
     minx, miny = 0
     maxx, maxy = 4
     currentx = 0
     currenty = 0
     if humanSector.x == maxx:
         if humanSector.y == miny:
-            pathFindUpTo(3, 0)
+            sectorPathFindUpTo(3, 0)
             for i in range(humanSector.x - 1):
                 sector = Sector()
                 sector.x = i
                 sector.y = currenty
-                path.append(sector)
+                sectorPath.append(sector)
             sector = Sector()
-            sector.x =
+            sector.x = humanSector.x - 1
+            sector.y = currrent.y + 1
+            seectorPath.append(sector)
+            sector.x = maxx
+            currentx = maxx
+            sector.y  = currrent.y + 1
+            sectorPath.append(sector)
+            currenty += 1
+        sectorPathFindRest(currentx, currenty, False)
+    elif humanSector.y == miny:
+        if humanSector.x != maxx:
+            sectorPathFindUpTo(humnanSector)
 
 rospy.Subscriber("/turtle1/pose", Pose, getLocation)
 rospy.Subscriber("/human/sector", Sector, getHumanSector)
@@ -122,4 +133,4 @@ while not initialReached:
     rate.sleep()
 
 # while not rospy.is_shutdown():
-#     pathFind()
+#     sectorPathFind()
